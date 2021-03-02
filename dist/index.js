@@ -58,34 +58,35 @@ async function run() {
      */
     const runHasFailures = results.includes(false);
     if (runHasFailures) {
+      const body = `**:no_entry_sign: Warning!**
+One of your citations appear to be offline.
+
+| no_entry_sign: Quote | 
+| -------------------- | 
+${results.map((r) => `| ${r} |\n`)}
+      `;
       octokit.issues.createComment({
         ...context.repo,
         issue_number:
           github.context.issue.number || getPullRequestNumber(context.ref),
-        body: `
-          **:no_entry_sign: Warning!**
-          One of your citations appear to be offline.
-
-          | no_entry_sign: Quote | 
-          | -------------------- | 
-          ${results.map((r) => `| ${r} |\n`)}
-        `,
+        body,
       });
     }
 
     if (postOnSuccess && !runHasFailures) {
+      const body = `**:white_check_mark: Good news!**
+All of your citations appear to be online.
+
+| :white_check_mark: Quote | 
+| ------------------------ | 
+${results.map((r) => `| ${r} |\n`)}
+      `;
+
       octokit.issues.createComment({
         ...context.repo,
         issue_number:
           github.context.issue.number || getPullRequestNumber(context.ref),
-        body: `
-          **:white_check_mark: Good news!**
-          All of your citations appear to be online.
-
-          | :white_check_mark: Quote | 
-          | ------------------------ | 
-          ${results.map((r) => `| ${r} |\n`)}
-        `,
+        body,
       });
     }
 
