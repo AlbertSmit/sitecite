@@ -3,23 +3,31 @@ const fetch = require("isomorphic-fetch");
 const { promises: fs } = require("fs");
 const github = require("@actions/github");
 
+/**
+ * Inputs
+ */
+const myToken = core.getInput("token");
+const path = core.getInput("path");
+const textfield = core.getInput("textfield");
+const urlfield = core.getInput("urlfield");
+
 const getPullRequestNumber = (ref) => {
-  core.debug(`Parsing ref: ${ref}`);
-  // This assumes that the ref is in the form of `refs/pull/:prNumber/merge`
-  const prNumber = ref.replace(/refs\/pull\/(\d+)\/merge/, "$1");
-  return parseInt(prNumber, 10);
+  return parseInt(ref.replace(/refs\/pull\/(\d+)\/merge/, "$1"), 10);
+};
+
+const matchText = async (entry) => {
+  const response = await fetch(new URL(entry[urlfield]));
+  return Boolean(
+    await response.text().match(new RegExp(entry[textfield], "g"))
+  );
+};
+
+const getResults = async (quotes) => {
+  return Promise.all(Object.values(quotes).map((entry) => matchText(entry)));
 };
 
 async function run() {
   try {
-    /**
-     * Inputs
-     */
-    const myToken = core.getInput("token");
-    const path = core.getInput("path");
-    const textfield = core.getInput("textfield");
-    const urlfield = core.getInput("urlfield");
-
     if (!myToken || !path || !textfield || !urlfield) {
       throw new Error("Insufficient config provided.");
     }
@@ -30,15 +38,7 @@ async function run() {
     const content = await fs.readFile(path, "utf-8");
     const json = JSON.parse(content);
 
-    const results = Object.values(json.quotes).map((entry) => {
-      (async () => {
-        const response = await fetch(new URL(entry[urlfield]));
-        const text = await response.text();
-
-        const present = Boolean(text.match(new RegExp(entry[textfield], "g")));
-        if (!present) core.warning("The following cite is broken:\n", present);
-      })();
-    });
+    const results = await getResults(json.quotes);
 
     /**
      * Comment on given PR.
@@ -52,6 +52,10 @@ async function run() {
           github.context.issue.number || getPullRequestNumber(context.ref),
         body: `
           One of your citations appear to be offline.
+
+          | Quote         | 
+          | ------------- | 
+          ${results.map((r) => `| ${r} |\n`)}
         `,
       });
     }
