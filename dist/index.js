@@ -10,23 +10,31 @@ const fetch = __nccwpck_require__(340);
 const { promises: fs } = __nccwpck_require__(747);
 const github = __nccwpck_require__(438);
 
+/**
+ * Inputs
+ */
+const myToken = core.getInput("token");
+const path = core.getInput("path");
+const textfield = core.getInput("textfield");
+const urlfield = core.getInput("urlfield");
+
 const getPullRequestNumber = (ref) => {
-  core.debug(`Parsing ref: ${ref}`);
-  // This assumes that the ref is in the form of `refs/pull/:prNumber/merge`
-  const prNumber = ref.replace(/refs\/pull\/(\d+)\/merge/, "$1");
-  return parseInt(prNumber, 10);
+  return parseInt(ref.replace(/refs\/pull\/(\d+)\/merge/, "$1"), 10);
+};
+
+const matchText = async (entry) => {
+  const response = await fetch(new URL(entry[urlfield]));
+  return Boolean(
+    await response.text().match(new RegExp(entry[textfield], "g"))
+  );
+};
+
+const getResults = async (quotes) => {
+  return Promise.all(Object.values(quotes).map((entry) => matchText(entry)));
 };
 
 async function run() {
   try {
-    /**
-     * Inputs
-     */
-    const myToken = core.getInput("token");
-    const path = core.getInput("path");
-    const textfield = core.getInput("textfield");
-    const urlfield = core.getInput("urlfield");
-
     if (!myToken || !path || !textfield || !urlfield) {
       throw new Error("Insufficient config provided.");
     }
@@ -37,25 +45,27 @@ async function run() {
     const content = await fs.readFile(path, "utf-8");
     const json = JSON.parse(content);
 
-    Object.values(json.quotes).forEach((entry) => {
-      (async () => {
-        const response = await fetch(new URL(entry[urlfield]));
-        const text = await response.text();
-        core.info("Text match:", text.match(entry[textfield]));
-      })();
-    });
+    const results = await getResults(json.quotes);
 
     /**
      * Comment on given PR.
      */
-    const context = github.context;
-    const octokit = github.getOctokit(myToken);
-    octokit.issues.createComment({
-      ...context.repo,
-      issue_number:
-        github.context.issue.number || getPullRequestNumber(context.ref),
-      body: "Test!",
-    });
+    if (results.includes(false)) {
+      const context = github.context;
+      const octokit = github.getOctokit(myToken);
+      octokit.issues.createComment({
+        ...context.repo,
+        issue_number:
+          github.context.issue.number || getPullRequestNumber(context.ref),
+        body: `
+          One of your citations appear to be offline.
+
+          | Quote         | 
+          | ------------- | 
+          ${results.map((r) => `| ${r} |\n`)}
+        `,
+      });
+    }
 
     core.setOutput("report", "Nothing yet. Just testing.");
   } catch (error) {
