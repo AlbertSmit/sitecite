@@ -1,6 +1,14 @@
 name: "Sitecite"
 description: "Check if citation is still available"
 inputs:
+  textfield:
+    description: "Key in JSON to take quote from"
+    required: true
+    default: "quote"
+  urlfield:
+    description: "Key in JSON to fetching from"
+    required: true
+    default: "url"
   path:
     description: "Path to config file"
     required: true

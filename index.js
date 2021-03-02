@@ -24,19 +24,19 @@ async function run() {
      * and which page to look on/
      */
     const textfield = core.getInput("textfield");
-    const url = core.getInput("url");
+    const urlfield = core.getInput("url");
 
     /**
      * Get page source.
      */
     (async () => {
-      const response = await fetch(url);
+      const response = await fetch(urlfield);
       const text = await response.text();
       core.info(text.match(textfield));
     })();
 
     (async () => {
-      const response = await fetch(url);
+      const response = await fetch(urlfield);
       const text = await response.text();
       const dom = await new JSDOM(text);
       core.info(dom.window.document.querySelector("h1").textContent);
