@@ -17,9 +17,8 @@ const getPullRequestNumber = (ref) => {
 
 const matchText = async (entry) => {
   const response = await fetch(new URL(entry[urlfield]));
-  return Boolean(
-    await response.text().match(new RegExp(entry[textfield], "g"))
-  );
+  const text = await response.text();
+  return Boolean(await text.match(new RegExp(entry[textfield], "g")));
 };
 
 const getResults = async (quotes) => {
