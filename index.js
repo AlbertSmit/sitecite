@@ -34,7 +34,6 @@ async function run() {
       (async () => {
         const response = await fetch(new URL(entry[urlfield]));
         const text = await response.text();
-        core.info("Entry:", entry);
         core.info("Text match:", text.match(entry[textfield]));
       })();
     });
@@ -46,7 +45,7 @@ async function run() {
     const octokit = github.getOctokit(myToken);
     octokit.issues.createComment({
       ...context.repo,
-      pull_number:
+      issue_number:
         github.context.issue.number || getPullRequestNumber(context.ref),
       body: "Test!",
     });
