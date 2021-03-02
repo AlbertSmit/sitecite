@@ -4,6 +4,12 @@ const { promises: fs } = require("fs");
 const github = require("@actions/github");
 
 /**
+ * Emoji
+ */
+const yay = ":white_check_mark:";
+const nay = ":no_entry_sign:";
+
+/**
  * Inputs
  */
 const myToken = core.getInput("token");
@@ -19,7 +25,10 @@ const getPullRequestNumber = (ref) => {
 const matchText = async (entry) => {
   const response = await fetch(new URL(entry[urlfield]));
   const text = await response.text();
-  return Boolean(await text.match(new RegExp(entry[textfield], "g")));
+  return {
+    found: Boolean(text.match(new RegExp(entry[textfield], "g"))),
+    cite: entry[textfield],
+  };
 };
 
 const getResults = async (quotes) => {
@@ -49,14 +58,14 @@ async function run() {
     /**
      * Comment on given PR.
      */
-    const runHasFailures = results.includes(false);
+    const runHasFailures = results.map((r) => r.found).includes(false);
     if (runHasFailures) {
-      const body = `**:no_entry_sign: Warning!**
+      const body = `**${nay} Warning!**
 One of your citations appear to be offline.
 
-| no_entry_sign: Quote | 
-| -------------------- | 
-${results.map((r) => `| ${r} |\n`)}
+| Found | ${nay} Quote |
+| ----- | ------------ | 
+${results.map((r) => `| ${r.found ? yay : nay} | ${r.cite} |\n`)}
       `;
       octokit.issues.createComment({
         ...context.repo,
@@ -67,12 +76,12 @@ ${results.map((r) => `| ${r} |\n`)}
     }
 
     if (postOnSuccess && !runHasFailures) {
-      const body = `**:white_check_mark: Good news!**
+      const body = `**${yay} Good news!**
 All of your citations appear to be online.
 
-| :white_check_mark: Quote | 
-| ------------------------ | 
-${results.map((r) => `| ${r} |\n`)}
+| ${yay} Quote | 
+| ------------ | 
+${results.map((r) => `| ${r.cite} |\n`)}
       `;
 
       octokit.issues.createComment({
