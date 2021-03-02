@@ -15,9 +15,20 @@ const getPullRequestNumber = (ref) => {
 async function run() {
   try {
     /**
+     * Inputs
+     */
+    const myToken = core.getInput("token");
+    const path = core.getInput("path");
+    const textfield = core.getInput("textfield");
+    const urlfield = core.getInput("url");
+
+    if (!myToken || !path || !textfield || !urlfield) {
+      throw new Error("Insufficient config provided.");
+    }
+
+    /**
      * Load config file.
      */
-    const path = core.getInput("path");
     const content = await fs.readFile(path, "utf8");
     core.setOutput("content", content);
 
@@ -25,36 +36,34 @@ async function run() {
      * Get all entries.
      */
     const json = JSON.parse(content);
-    Object.entries(json).map(([key, value]) => core.info(key, value));
-
-    /**
-     * Exact text to query for,
-     * and which page to look on/
-     */
-    const textfield = core.getInput("textfield");
-    const urlfield = core.getInput("url");
+    Object.values(json.quotes).forEach((entry) => {
+      (async () => {
+        const response = await fetch(new URL(entry[urlfield]));
+        const text = await response.text();
+        core.info(text.match(entry[textfield]));
+      })();
+    });
 
     /**
      * Get page source.
      */
-    (async () => {
-      const response = await fetch(urlfield);
-      const text = await response.text();
-      core.info(text.match(textfield));
-    })();
+    // (async () => {
+    //   const response = await fetch(urlfield);
+    //   const text = await response.text();
+    //   core.info(text.match(textfield));
+    // })();
 
-    (async () => {
-      const response = await fetch(urlfield);
-      const text = await response.text();
-      const dom = await new JSDOM(text);
-      core.info(dom.window.document.querySelector("h1").textContent);
-    })();
+    // (async () => {
+    //   const response = await fetch(urlfield);
+    //   const text = await response.text();
+    //   const dom = await new JSDOM(text);
+    //   core.info(dom.window.document.querySelector("h1").textContent);
+    // })();
 
     /**
      * Comment on given PR.
      */
     const context = github.context;
-    const myToken = core.getInput("token");
     const octokit = github.getOctokit(myToken);
     octokit.pulls.createReviewComment({
       ...context.repo,
