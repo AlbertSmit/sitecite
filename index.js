@@ -20,7 +20,7 @@ async function run() {
     const myToken = core.getInput("token");
     const path = core.getInput("path");
     const textfield = core.getInput("textfield");
-    const urlfield = core.getInput("url");
+    const urlfield = core.getInput("urlfield");
 
     if (!myToken || !path || !textfield || !urlfield) {
       throw new Error("Insufficient config provided.");
