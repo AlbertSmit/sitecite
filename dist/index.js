@@ -17,6 +17,7 @@ const myToken = core.getInput("token");
 const path = core.getInput("path");
 const textfield = core.getInput("textfield");
 const urlfield = core.getInput("urlfield");
+const postOnSuccess = core.getInput("postOnSuccess");
 
 const getPullRequestNumber = (ref) => {
   return parseInt(ref.replace(/refs\/pull\/(\d+)\/merge/, "$1"), 10);
@@ -47,20 +48,42 @@ async function run() {
     const results = await getResults(json.quotes);
 
     /**
+     * Set up comment context.
+     */
+    const context = github.context;
+    const octokit = github.getOctokit(myToken);
+
+    /**
      * Comment on given PR.
      */
-    if (results.includes(false)) {
-      const context = github.context;
-      const octokit = github.getOctokit(myToken);
+    const runHasFailures = results.includes(false);
+    if (runHasFailures) {
       octokit.issues.createComment({
         ...context.repo,
         issue_number:
           github.context.issue.number || getPullRequestNumber(context.ref),
         body: `
+          **:no_entry_sign: Warning!**
           One of your citations appear to be offline.
 
-          | Quote         | 
-          | ------------- | 
+          | no_entry_sign: Quote | 
+          | -------------------- | 
+          ${results.map((r) => `| ${r} |\n`)}
+        `,
+      });
+    }
+
+    if (postOnSuccess && !runHasFailures) {
+      octokit.issues.createComment({
+        ...context.repo,
+        issue_number:
+          github.context.issue.number || getPullRequestNumber(context.ref),
+        body: `
+          **:white_check_mark: Good news!**
+          All of your citations appear to be online.
+
+          | :white_check_mark: Quote | 
+          | ------------------------ | 
           ${results.map((r) => `| ${r} |\n`)}
         `,
       });
