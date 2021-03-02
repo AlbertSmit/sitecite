@@ -1,6 +1,9 @@
 name: "Sitecite"
 description: "Check if citation is still available"
 inputs:
+  token:
+    description: "Github token"
+    required: true
   textfield:
     description: "Key in JSON to take quote from"
     required: true
