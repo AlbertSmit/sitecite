@@ -20,22 +20,29 @@ async function run() {
     Object.entries(json).map(([key, value]) => core.info(key, value));
 
     /**
+     * Exact text to query for,
+     * and which page to look on/
+     */
+    const textfield = core.getInput("textfield");
+    const url = core.getInput("url");
+
+    /**
      * Get page source.
      */
     (async () => {
-      const response = await fetch("https://example.com");
+      const response = await fetch(url);
       const text = await response.text();
-      core.info(text.match(/(?<=<h1>).*(?=<\/h1>)/));
+      core.info(text.match(textfield));
     })();
 
     (async () => {
-      const response = await fetch("https://example.com");
+      const response = await fetch(url);
       const text = await response.text();
       const dom = await new JSDOM(text);
       core.info(dom.window.document.querySelector("h1").textContent);
     })();
 
-    core.setOutput("time", new Date().toTimeString());
+    core.setOutput("report", "Nothing yet. Just testing.");
   } catch (error) {
     core.setFailed(error.message);
   }
