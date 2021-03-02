@@ -1,13 +1,13 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: "Sitecite"
+description: "Check if citation is still available"
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  path:
+    description: "Path to config file"
     required: true
-    default: '1000'
+    default: "./sitecite"
 outputs:
-  time: # output will be available to future steps
-    description: 'The message to output'
+  report:
+    description: "Sitecite result"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

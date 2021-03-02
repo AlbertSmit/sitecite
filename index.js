@@ -1,18 +1,41 @@
-const core = require('@actions/core');
-const wait = require('./wait');
+const core = require("@actions/core");
+const fetch = require("isomorphic-fetch");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { promises: fs } = require("fs");
 
-
-// most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    /**
+     * Load config file.
+     */
+    const path = core.getInput("path");
+    const content = await fs.readFile(path, "utf8");
+    core.setOutput("content", content);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    /**
+     * Get all entries.
+     */
+    const json = JSON.parse(content);
+    Object.entries(json).map(([key, value]) => core.info(key, value));
 
-    core.setOutput('time', new Date().toTimeString());
+    /**
+     * Get page source.
+     */
+    (async () => {
+      const response = await fetch("https://example.com");
+      const text = await response.text();
+      core.info(text.match(/(?<=<h1>).*(?=<\/h1>)/));
+    })();
+
+    (async () => {
+      const response = await fetch("https://example.com");
+      const text = await response.text();
+      const dom = await new JSDOM(text);
+      core.info(dom.window.document.querySelector("h1").textContent);
+    })();
+
+    core.setOutput("time", new Date().toTimeString());
   } catch (error) {
     core.setFailed(error.message);
   }
