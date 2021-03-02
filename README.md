@@ -1,13 +1,10 @@
-<h1 align="center">  
+<h1>  
   <span href="https://github.com/albertsmit/visnet">
     <img src=".images/logo.png" alt="Logo" height="30"> 
     Sitecite
   </span>
 </h1>
-
-## Sitecite
-
-Check if your cited sources are still up.
+<sup><i>Check if your cited sources are still up. :rocket:</i></sup>
 
 ## Usage
 
