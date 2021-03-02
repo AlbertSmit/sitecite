@@ -34,7 +34,7 @@ async function run() {
     /**
      * Get all entries.
      */
-    const content = await fs.readFile(path);
+    const content = await fs.readFile(path, "utf-8");
     const json = JSON.parse(content);
 
     Object.values(json.quotes).forEach((entry) => {
@@ -51,7 +51,7 @@ async function run() {
      */
     const context = github.context;
     const octokit = github.getOctokit(myToken);
-    octokit.pulls.createReviewComment({
+    octokit.issues.createComment({
       ...context.repo,
       pull_number:
         github.context.issue.number || getPullRequestNumber(context.ref),
