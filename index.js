@@ -30,25 +30,31 @@ async function run() {
     const content = await fs.readFile(path, "utf-8");
     const json = JSON.parse(content);
 
-    Object.values(json.quotes).forEach((entry) => {
+    const results = Object.values(json.quotes).map((entry) => {
       (async () => {
         const response = await fetch(new URL(entry[urlfield]));
         const text = await response.text();
-        core.info("Text match:", text.match(entry[textfield]));
+
+        const present = Boolean(text.match(new RegExp(entry[textfield], "g")));
+        if (!present) core.warning("The following cite is broken:\n", present);
       })();
     });
 
     /**
      * Comment on given PR.
      */
-    const context = github.context;
-    const octokit = github.getOctokit(myToken);
-    octokit.issues.createComment({
-      ...context.repo,
-      issue_number:
-        github.context.issue.number || getPullRequestNumber(context.ref),
-      body: "Test!",
-    });
+    if (results.includes(false)) {
+      const context = github.context;
+      const octokit = github.getOctokit(myToken);
+      octokit.issues.createComment({
+        ...context.repo,
+        issue_number:
+          github.context.issue.number || getPullRequestNumber(context.ref),
+        body: `
+          One of your citations appear to be offline.
+        `,
+      });
+    }
 
     core.setOutput("report", "Nothing yet. Just testing.");
   } catch (error) {
