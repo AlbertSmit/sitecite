@@ -32,7 +32,7 @@ async function run() {
 
     Object.values(json.quotes).forEach((entry) => {
       (async () => {
-        const response = await fetch(URL(entry[urlfield]));
+        const response = await fetch(new URL(entry[urlfield]));
         const text = await response.text();
         core.info("Entry:", entry);
         core.info("Text match:", text.match(entry[textfield]));
@@ -44,7 +44,7 @@ async function run() {
      */
     const context = github.context;
     const octokit = github.getOctokit(myToken);
-    octokit.pulls.createComment({
+    octokit.pulls.createReviewComment({
       ...context.repo,
       pull_number:
         github.context.issue.number || getPullRequestNumber(context.ref),
