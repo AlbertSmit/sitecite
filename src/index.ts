@@ -3,7 +3,7 @@ import { context, getOctokit } from "@actions/github";
 import { postComment } from "./comment";
 import { createCheck } from "./check";
 import { promises as fs } from "fs";
-import "isomorphic-fetch";
+import bent from "bent";
 
 /**
  * Inputs
@@ -19,11 +19,11 @@ const urlfield: string = getInput("urlfield");
 const octokit = getOctokit(token);
 
 const matchText = async (entry) => {
-  const response = await fetch(entry[urlfield]);
-  const text = await response.text();
+  const getText = bent("string");
+  const response = await getText(entry[urlfield]);
 
   return {
-    found: Boolean(text.match(new RegExp(entry[textfield], "g"))),
+    found: Boolean(response.match(new RegExp(entry[textfield], "g"))),
     source: entry[urlfield],
     cite: entry[textfield],
   };
