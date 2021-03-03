@@ -10,7 +10,7 @@ export type CiteResult = {
   cite: string;
 };
 
-const header = `<h1><img width="48" src="https://raw.githubusercontent.com/AlbertSmit/sitecite/main/.github/static/logo.png"></img> Sitecite</h1>`;
+const header = `<h1><img width="25" src="https://raw.githubusercontent.com/AlbertSmit/sitecite/main/.github/static/left.png"></img> Sitecite <img width="25" src="https://raw.githubusercontent.com/AlbertSmit/sitecite/main/.github/static/right.png"></img></h1>`;
 const template = `${header}
 
 Hey! The results are in! ${wave}  
