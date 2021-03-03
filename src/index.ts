@@ -1,4 +1,10 @@
-import { endGroup, getInput, setFailed, startGroup } from "@actions/core";
+import {
+  endGroup,
+  getInput,
+  setFailed,
+  startGroup,
+  setOutput,
+} from "@actions/core";
 import { context, getOctokit } from "@actions/github";
 import { postComment } from "./comment";
 import { createCheck } from "./check";
@@ -74,6 +80,9 @@ async function run() {
 
     const failures = results.filter((r) => !r.found).length;
     const hasFailures = failures !== 0;
+    setOutput("failures", hasFailures);
+    setOutput("results", results);
+
     if (failOnNotFound && hasFailures) {
       await finish({
         conclusion: "failure",
