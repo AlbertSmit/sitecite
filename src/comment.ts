@@ -2,6 +2,7 @@ import { endGroup, startGroup } from "@actions/core";
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github/lib/utils";
 import { nay, script, wave, yay } from "./emoji";
+import { createDeploySignature } from "./hash";
 
 export type CiteResult = {
   source: string;
@@ -31,14 +32,15 @@ export async function postComment(
   results: CiteResult[]
 ) {
   startGroup(`Commenting on PR`);
-  const isCommentByBot = createBotCommentIdentifier("SITECITEBOT");
+  const deploySignature = createDeploySignature(results);
+  const isCommentByBot = createBotCommentIdentifier(deploySignature);
 
   const commentInfo = {
     ...context.repo,
     issue_number: context.issue.number,
   };
 
-  let commentId;
+  let commentId: number;
   try {
     const comments = (await github.issues.listComments(commentInfo)).data;
     for (let i = comments.length; i--; ) {
@@ -56,6 +58,8 @@ export async function postComment(
 ${results
   .map((r) => `| ${r.found ? yay : nay} | ${r.cite} | [source](${r.source}) |`)
   .join("\r\n")}
+
+  <sub>Sign: ${deploySignature}</sub>
 `;
 
   if (commentId) {
