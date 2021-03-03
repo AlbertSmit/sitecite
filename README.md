@@ -54,8 +54,7 @@ This means that if, for instance, your:
 **sitecite** will look for this:
 
 ```json
-[
-  // ...object as shown in example above
+"quotes": [
   {
     "tomato": "https://www.url-goes-here.io",
     "textgoeshere": "Guess what goes here! Woohoo!"
