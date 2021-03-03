@@ -20,6 +20,32 @@ with:
   failOnNotFound: true
 ```
 
+## Expected JSON format
+
+The expected JSON format is as follows.\
+Sitecite looks for a `quotes` key in the root of the provided JSON.\
+Then, from that **array**, it takes the data from these keys:
+
+- **URL** key from your `urlfield` input/key.
+- **Quote** key from your `textfield` input/key.
+
+### Example:
+
+```json
+{
+  "quotes": [
+    {
+      "link": "https://policies.google.com/terms?hl=en",
+      "quote": "respect the rights of others"
+    },
+    {
+      "link": "https://www.apple.com/legal/internet-services/itunes/us/terms.html",
+      "quote": "Please carefully read the information presented"
+    }
+  ]
+}
+```
+
 ## Special thanks
 
 Credit where credit is due!
