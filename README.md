@@ -17,6 +17,7 @@ with:
   urlfield: "link"
   textfield: "quote"
   path: "./data/quotes.json"
+  failOnNotFound: true
 ```
 
 ## Special thanks

@@ -12,6 +12,7 @@ const token: string = getInput("token");
 const path: string = getInput("path");
 const textfield: string = getInput("textfield");
 const urlfield: string = getInput("urlfield");
+const failOnNotFound: string = getInput("failOnNotFound");
 
 /**
  * Context / token
@@ -71,13 +72,26 @@ async function run() {
       await postComment(octokit, context, results);
     }
 
-    await finish({
-      conclusion: "success",
-      output: {
-        title: `Deploy preview succeeded`,
-        summary: "Check PR comments for report",
-      },
-    });
+    const hasFailures = results.filter((r) => !r.found);
+    if (failOnNotFound && hasFailures) {
+      await finish({
+        conclusion: "failure",
+        output: {
+          title: `Verifying Citations failed`,
+          summary: `There is ${hasFailures.length} broken citations. Check PR comment for overview.`,
+        },
+      });
+    }
+
+    if (!failOnNotFound || (failOnNotFound && !hasFailures)) {
+      await finish({
+        conclusion: "success",
+        output: {
+          title: `Verifying Citations succeeded`,
+          summary: "Check PR comments for overview",
+        },
+      });
+    }
   } catch (error) {
     setFailed(error.message);
 

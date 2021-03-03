@@ -1,7 +1,7 @@
 import { endGroup, startGroup } from "@actions/core";
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github/lib/utils";
-import { nay, script, wave, yay } from "./emoji";
+import { nay, smile, wave, yay } from "./emoji";
 import { createDeploySignature } from "./hash";
 
 export type CiteResult = {
@@ -62,7 +62,7 @@ ${results
 
 ---
 
-<sub>Sign: ${deploySignature}</sub>
+<sub>Sign: ${deploySignature}, so I can update this message in the future. ${smile}</sub>
 `;
 
   if (commentId) {
