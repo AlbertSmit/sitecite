@@ -23,7 +23,7 @@ with:
 ## Expected JSON format
 
 The expected JSON format is as follows.\
-Sitecite looks for a `quotes` key in the root of the provided JSON.\
+**Sitecite** looks for a `quotes` key in the root of the provided JSON.\
 Then, from that **array**, it takes the data from these keys:
 
 - **URL** key from your `urlfield` input/key.
@@ -44,6 +44,23 @@ Then, from that **array**, it takes the data from these keys:
     }
   ]
 }
+```
+
+This means that if, for instance, your:
+
+- `urlfield` is `tomato`, and
+- your `textfield` is `textgoeshere`
+
+**sitecite** will look for this:
+
+```json
+[
+  // ...object as shown in example above
+  {
+    "tomato": "https://www.url-goes-here.io",
+    "textgoeshere": "Guess what goes here! Woohoo!"
+  }
+]
 ```
 
 ## Special thanks
