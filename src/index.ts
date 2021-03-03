@@ -72,18 +72,18 @@ async function run() {
       await postComment(octokit, context, results);
     }
 
-    const hasFailures = results.filter((r) => !r.found);
+    const hasFailures = results.filter((r) => !r.found).length;
     if (failOnNotFound && hasFailures) {
       await finish({
         conclusion: "failure",
         output: {
           title: `Verifying Citations failed`,
-          summary: `There is ${hasFailures.length} broken citations. Check PR comment for overview.`,
+          summary: `There is ${hasFailures} broken citations. Check PR comment for overview.`,
         },
       });
     }
 
-    if (!failOnNotFound || (failOnNotFound && !hasFailures)) {
+    if (!failOnNotFound || (failOnNotFound && hasFailures !== 0)) {
       await finish({
         conclusion: "success",
         output: {
