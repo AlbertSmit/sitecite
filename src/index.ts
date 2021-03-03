@@ -1,10 +1,9 @@
-import { info, endGroup, getInput, setFailed, startGroup } from "@actions/core";
+import { endGroup, getInput, setFailed, startGroup } from "@actions/core";
 import { context, getOctokit } from "@actions/github";
+import { postComment } from "./comment";
+import { createCheck } from "./check";
 import { promises as fs } from "fs";
 import "isomorphic-fetch";
-import { createCheck } from "./check";
-import { postComment } from "./comment";
-import { nay, script, wave, yay } from "./emoji";
 
 /**
  * Inputs

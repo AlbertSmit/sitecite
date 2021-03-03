@@ -2,7 +2,12 @@ import { endGroup, startGroup } from "@actions/core";
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github/lib/utils";
 import { nay, script, wave, yay } from "./emoji";
-import { CiteResult } from "./types";
+
+export type CiteResult = {
+  source: string;
+  found: boolean;
+  cite: string;
+};
 
 const template = `## ${script} Sitecite results**
 
