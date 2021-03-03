@@ -3,7 +3,7 @@ import { context, getOctokit } from "@actions/github";
 import { postComment } from "./comment";
 import { createCheck } from "./check";
 import { promises as fs } from "fs";
-import bent from "bent";
+import fetch from "node-fetch";
 
 /**
  * Inputs
@@ -18,21 +18,32 @@ const urlfield: string = getInput("urlfield");
  */
 const octokit = getOctokit(token);
 
+/**
+ * Find text on
+ * given page.
+ */
 const matchText = async (entry) => {
-  const getText = bent("string");
-  const response = await getText(entry[urlfield]);
+  const response = await fetch(entry[urlfield]);
+  const text = await response.text();
 
   return {
-    found: Boolean(response.match(new RegExp(entry[textfield], "g"))),
+    found: Boolean(text.match(new RegExp(entry[textfield], "g"))),
     source: entry[urlfield],
     cite: entry[textfield],
   };
 };
 
+/**
+ * Run async query
+ * for each entry.
+ */
 const getResults = async (quotes) => {
   return Promise.all(Object.values(quotes).map((entry) => matchText(entry)));
 };
 
+/**
+ * Main function.
+ */
 async function run() {
   const isPullRequest = !!context.payload.pull_request;
   if (token && isPullRequest) {
