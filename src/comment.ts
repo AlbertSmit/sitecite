@@ -10,9 +10,10 @@ export type CiteResult = {
   cite: string;
 };
 
-const template = `## ${script} Sitecite results**
+const header = `<h1><img width="48" src="https://raw.githubusercontent.com/AlbertSmit/sitecite/main/.github/static/logo.png"></img> Sitecite</h1>`;
+const template = `${header}
 
-Hey! ${wave}  
+Hey! The results are in! ${wave}  
 
 I'm a bot to check if all your cited (external) sources are still up.
 Here's an overview of your requested review:
@@ -59,7 +60,9 @@ ${results
   .map((r) => `| ${r.found ? yay : nay} | ${r.cite} | [source](${r.source}) |`)
   .join("\r\n")}
 
-  <sub>Sign: ${deploySignature}</sub>
+---
+
+<sub>Sign: ${deploySignature}</sub>
 `;
 
   if (commentId) {

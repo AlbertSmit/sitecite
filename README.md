@@ -18,3 +18,11 @@ with:
   textfield: "quote"
   path: "./data/quotes.json"
 ```
+
+## Special thanks
+
+Credit where credit is due!
+Thanks for some functions :heart:
+
+- [Firebase Deploy Action](https://github.com/FirebaseExtended/action-hosting-deploy)
+- [JS Action Template](https://github.com/actions/javascript-action)
