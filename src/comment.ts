@@ -17,8 +17,7 @@ I'm a bot to check if all your cited (external) sources are still up.
 Here's an overview of your requested review:
     
 | Found | Cited text | Source |
-| ----- | ---------- | ------ |
-`;
+| ----- | ---------- | ------ |`;
 
 const createBotCommentIdentifier = (signature: string) => {
   return function isCommentByBot(comment): boolean {
