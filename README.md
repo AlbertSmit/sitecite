@@ -20,6 +20,23 @@ with:
   failOnNotFound: true
 ```
 
+## Inputs
+
+| Input            | Type    | Required | Default           |
+| ---------------- | ------- | -------- | ----------------- |
+| `token`          | string  | `true`   | `null`            |
+| `urlfield`       | string  | `true`   | `link`            |
+| `textfield`      | string  | `true`   | `quote`           |
+| `path`           | string  | `true`   | `./sitecite.json` |
+| `failOnNotFound` | boolean | `false`  | `false`           |
+
+## Outputs
+
+| Output     | Type    | Description                                   |
+| ---------- | ------- | --------------------------------------------- |
+| `failures` | boolean | Wether any quote has been failed to be found  |
+| `results`  | array   | The actual results as found in the PR comment |
+
 ## Expected JSON format
 
 The expected JSON format is as follows.\

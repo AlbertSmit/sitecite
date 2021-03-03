@@ -15,12 +15,14 @@ inputs:
   path:
     description: "Path to config file"
     required: true
-    default: "./sitecite"
+    default: "./sitecite.json"
   failOnNotFound:
     description: "Make check fail when citation is not found"
     required: false
     default: false
 outputs:
+  failures:
+    description: "Has sitecite ran into failures?"
   results:
     description: "Sitecite result"
 runs:
