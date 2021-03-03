@@ -5834,7 +5834,7 @@ function wrappy (fn, cb) {
 /***/ 351:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const { core, startGroup, endGroup } = __nccwpck_require__(186);
+const core = __nccwpck_require__(186);
 const fetch = __nccwpck_require__(340);
 const { promises: fs } = __nccwpck_require__(747);
 const github = __nccwpck_require__(438);
@@ -5844,25 +5844,21 @@ const github = __nccwpck_require__(438);
  */
 const yay = ":white_check_mark:";
 const nay = ":no_entry_sign:";
+const script = ":scroll:";
 
 /**
  * Inputs
  */
-const token = process.env.GITHUB_TOKEN || core.getInput("token");
+const token = core.getInput("token");
 const path = core.getInput("path");
 const textfield = core.getInput("textfield");
 const urlfield = core.getInput("urlfield");
-// const postOnSuccess = core.getInput("postOnSuccess");
 
 /**
  * Context / token
  */
 const context = github.context;
 const octokit = github.getOctokit(token);
-
-const getPullRequestNumber = (ref) => {
-  return parseInt(ref.replace(/refs\/pull\/(\d+)\/merge/, "$1"), 10);
-};
 
 const createBotCommentIdentifier = (signature) => {
   return function isCommentByBot(comment) {
@@ -5873,9 +5869,11 @@ const createBotCommentIdentifier = (signature) => {
 const matchText = async (entry) => {
   const response = await fetch(new URL(entry[urlfield]));
   const text = await response.text();
+  core.info("matchText found:", text.match(new RegExp(entry[textfield], "g")));
 
   return {
     found: Boolean(text.match(new RegExp(entry[textfield], "g"))),
+    source: entry[urlfield],
     cite: entry[textfield],
   };
 };
@@ -5889,21 +5887,20 @@ async function run() {
     /**
      * Get all entries.
      */
-    startGroup("Reading json from path");
+    core.startGroup("Reading json from path");
     const content = await fs.readFile(path, "utf-8");
     const json = JSON.parse(content);
-    endGroup();
+    core.endGroup();
 
-    startGroup("Checking the citations");
+    core.startGroup("Checking the citations");
     const results = await getResults(json.quotes);
-    endGroup();
+    core.endGroup();
 
     /**
      * Comment on given PR.
      */
-    startGroup(`Commenting on PR`);
+    core.startGroup(`Commenting on PR`);
     const isCommentByBot = createBotCommentIdentifier("SITECITEBOT");
-    // const runHasFailures = results.map((r) => r.found).includes(false);
 
     const commentInfo = {
       ...context.repo,
@@ -5912,7 +5909,7 @@ async function run() {
 
     let commentId;
     try {
-      const comments = (await github.issues.listComments(commentInfo)).data;
+      const comments = (await octokit.issues.listComments(commentInfo)).data;
       for (let i = comments.length; i--; ) {
         const c = comments[i];
         if (isCommentByBot(c)) {
@@ -5924,23 +5921,19 @@ async function run() {
       console.log("Error checking for previous comments: " + e.message);
     }
 
-    const body = `**${nay} Warning!**
+    const body = `**${script} Sitecite results**
     One of your citations appear to be offline.
     
-    | Found | ${nay} Quote |
-    | ----- | ------------ | 
-    ${results.map((r) => `| ${r.found ? yay : nay} | ${r.cite} |\n`)}
+    | Found | ${nay} Quote | Source |
+    | ----- | ------------ | ------ |
+    ${results.map(
+      (r) => `| ${r.found ? yay : nay} | ${r.cite} | [source](${r.source}) | \n`
+    )}
     `;
-    octokit.issues.createComment({
-      ...context.repo,
-      issue_number:
-        github.context.issue.number || getPullRequestNumber(context.ref),
-      body,
-    });
 
     if (commentId) {
       try {
-        await github.issues.updateComment({
+        await octokit.issues.updateComment({
           ...context.repo,
           comment_id: commentId,
           body,
@@ -5952,12 +5945,12 @@ async function run() {
 
     if (!commentId) {
       try {
-        await github.issues.createComment({ ...commentInfo, body });
+        await octokit.issues.createComment({ ...commentInfo, body });
       } catch (e) {
         console.log(`Error creating comment: ${e.message}`);
       }
     }
-    endGroup();
+    core.endGroup();
   } catch (error) {
     core.setFailed(error.message);
   }

@@ -16,10 +16,6 @@ inputs:
     description: "Path to config file"
     required: true
     default: "./sitecite"
-  postOnSuccess:
-    description: "Comment validated citations on PR"
-    required: false
-    default: false
 outputs:
   report:
     description: "Sitecite result"
