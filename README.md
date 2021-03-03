@@ -20,13 +20,14 @@ with:
   failOnNotFound: true
 ```
 
-## JSON
+## Expected JSON format
 
-The expected JSON format is as follows.
-Sitecite takes the data from these keys:
+The expected JSON format is as follows.\
+Sitecite looks for a `quotes` key in the root of the provided JSON.\
+Then, from that **array**, it takes the data from these keys:
 
-- URL key from your `urlfield` input.
-- Quote key from your `textfield` key.
+- **URL** key from your `urlfield` input/key.
+- **Quote** key from your `textfield` input/key.
 
 ### Example:
 
