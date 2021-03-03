@@ -6,14 +6,6 @@
 </h1>
 <sup><i>Check if your cited sources are still up. :rocket:</i></sup>
 
-## Have you ever...
-
-Cited another persons website, and actually checked if the quote was still up there after a while?
-Right. Neither have I.
-
-I ran into a scenario where I did want to know about this;
-and so this action was born.
-
 ## Usage
 
 You can now consume the action by referencing the v1 branch
@@ -26,3 +18,11 @@ with:
   textfield: "quote"
   path: "./data/quotes.json"
 ```
+
+## Special thanks
+
+Credit where credit is due!
+Thanks for some functions :heart:
+
+- [Firebase Deploy Action](https://github.com/FirebaseExtended/action-hosting-deploy)
+- [JS Action Template](https://github.com/actions/javascript-action)
