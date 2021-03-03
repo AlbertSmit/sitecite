@@ -1,7 +1,8 @@
 <h1>  
-  <span href="https://github.com/albertsmit/visnet">
-    <img src=".github/static/logo.png" alt="Logo" height="30"> 
+  <span href="https://github.com/albertsmit/sitecite">
+    <img src=".github/static/left.png" alt="Logo" height="25"> 
     sitecite
+    <img src=".github/static/right.png" alt="Logo" height="25"> 
   </span>
 </h1>
 <sup><i>Check if your cited sources are still up. :rocket:</i></sup>
