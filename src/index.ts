@@ -46,8 +46,9 @@ const getResults = async (quotes) => {
  */
 async function run() {
   const isPullRequest = !!context.payload.pull_request;
+  let finish = (details: Object) => console.log(details);
   if (token && isPullRequest) {
-    await createCheck(octokit, context);
+    finish = await createCheck(octokit, context);
   }
 
   try {
@@ -67,11 +68,26 @@ async function run() {
      * Comment on given PR.
      */
     if (token && isPullRequest && !!octokit) {
-      const commitId = context.payload.pull_request?.head.sha.substring(0, 7);
       await postComment(octokit, context, results);
     }
+
+    await finish({
+      conclusion: "success",
+      output: {
+        title: `Deploy preview succeeded`,
+        summary: "Check PR comments for report",
+      },
+    });
   } catch (error) {
     setFailed(error.message);
+
+    await finish({
+      conclusion: "failure",
+      output: {
+        title: "Verifying Citations failed",
+        summary: `Error: ${error.message}`,
+      },
+    });
   }
 }
 
