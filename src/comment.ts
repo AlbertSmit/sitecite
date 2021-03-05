@@ -21,7 +21,7 @@ Here's an overview of your requested review:
 | Found | Cited text | Source |
 | ----- | ---------- | ------ |`;
 
-const createBotCommentIdentifier = (signature: string) => {
+export const createBotCommentIdentifier = (signature: string) => {
   return function isCommentByBot(comment): boolean {
     return comment.user.type === "Bot" && comment.body.includes(signature);
   };
